@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: dual-core-snapshot-pv
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: general-storage-class
+  local:
+    path: /data/dual-core-snapshot
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: persistent_data
+              operator: In
+              values:
+                - all
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: dual-core-snapshot-pvc
+spec:
+  storageClassName: general-storage-class
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dual-core-snapshot
+  labels:
+    app: dual-core-snapshot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dual-core-snapshot
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: dual-core-snapshot
+      annotations:
+        description: "Snapshot dual core daily"
+    spec:
+      containers:
+        - name: dual-core-snapshot
+          image: easyprompt2023/dual-core-snapshot:latest
+          command: ['node']
+          args: ['dist/main.js']
+          imagePullPolicy: Always
+          env:
+            - name: MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  name: btc-restaking-be
+                  key: MONGO_URL
+            - name: RPC_URL
+              valueFrom:
+                secretKeyRef:
+                  name: btc-restaking-be
+                  key: RPC_URL
+            - name: DUAL_CORE_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: btc-restaking-be
+                  key: DUAL_CORE_ADDRESS
+          volumeMounts:
+            - mountPath: "/home/node/app/volumes"
+              name: dual-core-snapshot-volumes
+      imagePullSecrets:
+        - name: cred-docker-hub
+      volumes:
+        - name: dual-core-snapshot-volumes
+          persistentVolumeClaim:
+            claimName: dual-core-snapshot-pvc
