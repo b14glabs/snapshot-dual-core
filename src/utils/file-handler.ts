@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'fs'
 import { logger } from '../logger'
 import path from 'path'
 
-const fromBlockPath = path.join(__dirname, `../../volumes/fromBlock`)
+const fromBlockPath = path.join(__dirname, `../../volumes/transferEventFromBlock`)
 const addressesPath = path.join(__dirname, `../../volumes/addresses.json`)
 
 export async function readFromBlock(): Promise<number> {

@@ -7,14 +7,10 @@ export const insertSnapshot = (data: ISnapshot[]) => {
   })
 }
 
-export const checkSavedSnapshotToday = async () => {
-  const current = new Date()
-  current.setHours(0, 0, 0, 0)
+export const checkSnapshotAtDate = async (date: Date) => {
   const doc = await snapshotSchema.findOne({
     type: TYPE.DUAL_CORE_SNAPSHOT,
-    createdAt: {
-      $gte: current,
-    },
+    snapshotDate: date,
   })
   return Boolean(doc)
 }

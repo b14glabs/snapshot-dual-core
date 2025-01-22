@@ -30,7 +30,7 @@ export type DualCoreSnapshotData = {
   snapshotDate: Date
 }
 
-async function saveAddressesAfterRemoveZeroBalance(
+async function saveAddresses(
   data: Record<
     string,
     {
@@ -43,19 +43,17 @@ async function saveAddressesAfterRemoveZeroBalance(
       address: el,
       balance: data[el].balance,
     }))
-    .filter((el) => el.balance != BigInt(0))
+    // .filter((el) => el.balance != BigInt(0))
     .map((el) => el.address)
   await writeAddresses([...new Set(addresses)])
 }
 
-export const dualCoreSnapshot = async (): Promise<DualCoreSnapshotData[]> => {
+export const dualCoreSnapshot = async (date: Date, block: number): Promise<DualCoreSnapshotData[]> => {
   try {
-    const currentDate = new Date()
-    currentDate.setHours(0, 0, 0, 0)
     const { addresses, fromBlock } = await crawlAddress()
     logger.info(`Snapshot from block ${fromBlock}`)
-    const balances = await getBlanceOfBatch(addresses)
-    await saveAddressesAfterRemoveZeroBalance(balances)
+    const balances = await getBlanceOfBatch(addresses, block)
+    await saveAddresses(balances)
 
     const balancesWithType = (await addType(balances)) as Record<
       string,
@@ -64,24 +62,16 @@ export const dualCoreSnapshot = async (): Promise<DualCoreSnapshotData[]> => {
         type: 'wallet' | 'contract'
       }
     >
-    const contract = new web3.eth.Contract(
-      dualCoreAbi,
-      process.env.DUAL_CORE_ADDRESS
-    )
-    const owner = await contract.methods.owner().call()
-
     const records = Object.keys(balancesWithType)
       .map((wallet) => {
         if (
-          balancesWithType[wallet].type == 'wallet' &&
-          (owner as unknown as string).toLowerCase() !== wallet.toLowerCase() &&
           balancesWithType[wallet].balance != BigInt(0)
         ) {
           return {
             holder: wallet.toLowerCase(),
             amount: balancesWithType[wallet].balance.toString(),
             type: TYPE.DUAL_CORE_SNAPSHOT,
-            snapshotDate: currentDate,
+            snapshotDate: date,
           }
         }
       })
@@ -94,7 +84,8 @@ export const dualCoreSnapshot = async (): Promise<DualCoreSnapshotData[]> => {
 }
 
 const getBlanceOfBatch = async (
-  addresses: string[]
+  addresses: string[],
+  block: number
 ): Promise<
   Record<
     string,
@@ -110,7 +101,7 @@ const getBlanceOfBatch = async (
     const to = Math.min(i + step, addresses.length)
     const balanceBatch = contract.methods
       .balanceOfBatch(addresses.slice(i, to), process.env.DUAL_CORE_ADDRESS)
-      .call()
+      .call({}, block)
       .then((balances) => ({ index: i, balances }))
     promises.push(balanceBatch)
   }
