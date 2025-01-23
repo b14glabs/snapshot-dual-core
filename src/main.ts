@@ -1,8 +1,7 @@
-import express from 'express'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
-import { cronjob } from './cronjob'
 import Web3 from 'web3'
+import { listenEvents } from './cronjob/crawl-claim-event'
 
 dotenv.config()
 
@@ -24,4 +23,4 @@ BigInt.prototype.toJSON = function () {
   return this.toString()
 }
 
-
+listenEvents()
