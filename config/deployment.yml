@@ -80,6 +80,11 @@ spec:
                 secretKeyRef:
                   name: dual-core-snapshot
                   key: DUAL_CORE_ADDRESS
+            - name: CORE_VAULT_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: dual-core-snapshot
+                  key: CORE_VAULT_ADDRESS
           volumeMounts:
             - mountPath: "/home/node/app/volumes"
               name: dual-core-snapshot-volumes
