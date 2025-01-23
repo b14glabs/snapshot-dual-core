@@ -27,7 +27,7 @@ export type DualCoreSnapshotData = {
   holder: string
   amount: string
   type: TYPE
-  snapshotDate: Date
+  time: Date
 }
 
 async function saveAddresses(
@@ -71,7 +71,7 @@ export const dualCoreSnapshot = async (date: Date, block: number): Promise<DualC
             holder: wallet.toLowerCase(),
             amount: balancesWithType[wallet].balance.toString(),
             type: TYPE.DUAL_CORE_SNAPSHOT,
-            snapshotDate: date,
+            time: date,
           }
         }
       })

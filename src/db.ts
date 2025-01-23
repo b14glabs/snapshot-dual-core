@@ -7,7 +7,7 @@ export const insertPointBatch = async (
     point: number
     type: string
     amount: string
-    snapshotDate: Date
+    time: Date
   }>,
   currentDate = new Date()
 ) => {

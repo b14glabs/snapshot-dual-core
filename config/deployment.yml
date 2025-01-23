@@ -68,17 +68,17 @@ spec:
             - name: MONGO_URL
               valueFrom:
                 secretKeyRef:
-                  name: btc-restaking-be
+                  name: dual-core-snapshot
                   key: MONGO_URL
             - name: RPC_URL
               valueFrom:
                 secretKeyRef:
-                  name: btc-restaking-be
+                  name: dual-core-snapshot
                   key: RPC_URL
             - name: DUAL_CORE_ADDRESS
               valueFrom:
                 secretKeyRef:
-                  name: btc-restaking-be
+                  name: dual-core-snapshot
                   key: DUAL_CORE_ADDRESS
           volumeMounts:
             - mountPath: "/home/node/app/volumes"

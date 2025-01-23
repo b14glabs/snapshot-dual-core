@@ -7,7 +7,7 @@ export interface ISnapshot {
   type: string
   rewardBy?: string
   rewardType?: string // dualCore-holder
-  snapshotDate: Date
+  time: Date
 }
 
 const SnapshotSchema = new mongoose.Schema<ISnapshot>(
@@ -20,19 +20,23 @@ const SnapshotSchema = new mongoose.Schema<ISnapshot>(
     point: Number,
     amount: String,
     type: String,
-    snapshotDate: Date,
+    time: Date,
   },
   { collection: 'snapshot', timestamps: true }
 )
 
 SnapshotSchema.index(
   {
-    snapshotDate: 1,
+    time: 1,
     holder: 1,
+    type: 1,
   },
   {
     unique: true,
-    sparse: true
+    partialFilterExpression: {
+      time: { $type: 'date' },
+      type: { $eq: 'dual-core-snapshot' },
+    },
   }
 )
 
