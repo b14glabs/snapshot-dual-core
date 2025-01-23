@@ -10,7 +10,7 @@ export const insertSnapshot = (data: ISnapshot[]) => {
 export const checkSnapshotAtDate = async (date: Date) => {
   const doc = await snapshotSchema.findOne({
     type: TYPE.DUAL_CORE_SNAPSHOT,
-    snapshotDate: date,
+    time: date,
   })
   return Boolean(doc)
 }
