@@ -12,19 +12,7 @@ export const insertPointBatch = async (
   currentDate = new Date()
 ) => {
   if (!results.length) return
-  const insertedFailed = []
-  try {
-    await insertSnapshot(results)
-  } catch (error) {
-    insertedFailed.push(...getFailedRecord(results, error))
-    if (insertedFailed.length) {
-      await writeFileSync(
-        `volumes/snapshot_failed_${currentDate.toISOString().split('T')[0].replace(/-/g, '_')}.json`,
-        JSON.stringify(insertedFailed)
-      )
-    }
-    throw error
-  }
+  return insertSnapshot(results)
 }
 
 const getFailedRecord = (data: Array<any>, error) => {
