@@ -85,6 +85,16 @@ spec:
                 secretKeyRef:
                   name: dual-core-snapshot
                   key: CORE_VAULT_ADDRESS
+            - name: SAVE_POINT_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: dual-core-snapshot
+                  key: SAVE_POINT_ENDPOINT
+            - name: SAVE_POINT_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dual-core-snapshot
+                  key: SAVE_POINT_PRIVATE_KEY
           volumeMounts:
             - mountPath: "/home/node/app/volumes"
               name: dual-core-snapshot-volumes
