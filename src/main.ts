@@ -5,7 +5,7 @@ import { listenEvents } from './cronjob/crawl-claim-event'
 
 dotenv.config()
 
-const DB_NAME = 'btc_restaking'
+const DB_NAME = 'user'
 
 mongoose.connect(process.env.MONGO_URL as string, {
   dbName: DB_NAME,
