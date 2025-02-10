@@ -1,5 +1,4 @@
 import path from 'path'
-import dualCoreAbi from '../abi/dualCore.json'
 import { promises as fsPromises } from 'fs'
 import { readFile } from 'fs/promises'
 import beHelperAbi from '../abi/beHelperAbi.json'
