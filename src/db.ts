@@ -1,5 +1,4 @@
-import { writeFileSync } from 'fs'
-import { insertSnapshot } from './service/snapshot.service'
+import { insertPoint } from './service/point.service'
 
 export const insertPointBatch = async (
   results: Array<{
@@ -12,7 +11,7 @@ export const insertPointBatch = async (
   currentDate = new Date()
 ) => {
   if (!results.length) return
-  return insertSnapshot(results)
+  return insertPoint(results)
 }
 
 const getFailedRecord = (data: Array<any>, error) => {

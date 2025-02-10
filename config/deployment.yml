@@ -104,3 +104,16 @@ spec:
         - name: dual-core-snapshot-volumes
           persistentVolumeClaim:
             claimName: dual-core-snapshot-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dual-core-snapshot-service
+spec:
+  selector:
+    app: dual-core-snapshot
+  ports:
+    - protocol: TCP
+      port: 3001
+      targetPort: 3001
+  type: ClusterIP

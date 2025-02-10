@@ -2,7 +2,7 @@ import { insertPointBatch } from '../db'
 import { dualCoreSnapshot } from './dual-core-snapshot'
 import { logger } from '../logger'
 import fs from 'fs'
-import { checkSnapshotAtDate } from '../service/snapshot.service'
+import { checkSnapshotAtDate } from '../service/point.service'
 import { calculatePoints } from '../utils'
 
 const snapshotDataName = 'snapshot_data_'

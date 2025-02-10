@@ -1,10 +1,10 @@
 import { TYPE } from '../const'
-import snapshotSchema, { ISnapshot } from '../model/snapshot.schema'
+import snapshotSchema, { IPoint } from '../model/point.schema'
 import axios from "axios";
 import * as crypto from "crypto";
 import * as secp256k1 from "secp256k1";
 
-export async function insertSnapshot(data: ISnapshot[]) {
+export async function insertPoint(data: IPoint[]) {
   try {
     const sigObj = secp256k1.ecdsaSign(
       Buffer.from(
