@@ -4,6 +4,7 @@ import fs from 'fs'
 import { log } from 'console'
 import { web3 } from '../main'
 import { snapshot } from '.'
+import { persistLog } from '../logger'
 
 const coreVaultFromBlockPath = 'volumes/coreVaultFromBlock'
 
@@ -46,7 +47,7 @@ export async function listenEvents() {
 
     fs.writeFileSync(coreVaultFromBlockPath, toBlock.toString())
   } catch (error) {
-    log(error)
+    persistLog(`listenEvents error: ${error}`)
   } finally {
     setTimeout(() => {
       listenEvents()

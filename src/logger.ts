@@ -1,3 +1,4 @@
+import { appendFileSync } from 'fs'
 import winston from 'winston'
 
 // Create a Winston logger
@@ -18,3 +19,16 @@ export const logger = winston.createLogger({
     }),
   ],
 })
+
+export function persistLog(content: any, persist = true) {
+  try {
+      console.log(content)
+      if (persist) {
+          appendFileSync("./volumes/log.txt", `\n${new Date().toISOString()}: ${JSON.stringify(content)}`, {
+              encoding: "utf8"
+          })
+      }
+  } catch (error) {
+      console.error("Log error", error)
+  }
+}

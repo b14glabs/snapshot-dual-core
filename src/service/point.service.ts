@@ -3,6 +3,7 @@ import snapshotSchema, { IPoint } from '../model/point.schema'
 import axios from "axios";
 import * as crypto from "crypto";
 import * as secp256k1 from "secp256k1";
+import { persistLog } from '../logger';
 
 export async function insertPoint(data: IPoint[]) {
   try {
@@ -20,7 +21,7 @@ export async function insertPoint(data: IPoint[]) {
     }
     
   } catch (error) {
-    console.error(`save point error : ${error}`)
+    persistLog(`save point error : ${error}`)
   }
 }
 

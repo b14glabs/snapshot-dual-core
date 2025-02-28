@@ -5,7 +5,7 @@ import beHelperAbi from '../abi/beHelperAbi.json'
 import { BE_HELPER_ADDRESS, TYPE } from '../const'
 import { web3 } from '../main'
 import { writeAddresses } from '../utils/file-handler'
-import { logger } from '../logger'
+import { logger, persistLog } from '../logger'
 import { crawlAddress } from '../utils/crawl-addresses'
 
 type AccountType = 'wallet' | 'contract'
@@ -50,7 +50,7 @@ async function saveAddresses(
 export const dualCoreSnapshot = async (date: Date, block: number): Promise<DualCoreSnapshotData[]> => {
   try {
     const { addresses, fromBlock } = await crawlAddress()
-    logger.info(`Snapshot from block ${fromBlock}`)
+    persistLog(`Snapshot from block ${fromBlock}`)
     const balances = await getBlanceOfBatch(addresses, block)
     await saveAddresses(balances)
 
@@ -77,7 +77,7 @@ export const dualCoreSnapshot = async (date: Date, block: number): Promise<DualC
       .filter((record) => record != undefined)
     return records
   } catch (error) {
-    logger.error('dualcore snapshot', error)
+    logger.info(`dualCore snapshot : ${error}`)
     return undefined
   }
 }
