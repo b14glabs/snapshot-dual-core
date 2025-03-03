@@ -1,0 +1,440 @@
+[
+    {
+        "outputs": [
+            {
+                "name": "blockNumber",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "returnData",
+                "internalType": "bytes[]",
+                "type": "bytes[]"
+            }
+        ],
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "name": "target",
+                        "internalType": "address",
+                        "type": "address"
+                    },
+                    {
+                        "name": "callData",
+                        "internalType": "bytes",
+                        "type": "bytes"
+                    }
+                ],
+                "name": "calls",
+                "internalType": "struct Multicall3.Call[]",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "aggregate",
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "name": "success",
+                        "internalType": "bool",
+                        "type": "bool"
+                    },
+                    {
+                        "name": "returnData",
+                        "internalType": "bytes",
+                        "type": "bytes"
+                    }
+                ],
+                "name": "returnData",
+                "internalType": "struct Multicall3.Result[]",
+                "type": "tuple[]"
+            }
+        ],
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "name": "target",
+                        "internalType": "address",
+                        "type": "address"
+                    },
+                    {
+                        "name": "allowFailure",
+                        "internalType": "bool",
+                        "type": "bool"
+                    },
+                    {
+                        "name": "callData",
+                        "internalType": "bytes",
+                        "type": "bytes"
+                    }
+                ],
+                "name": "calls",
+                "internalType": "struct Multicall3.Call3[]",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "aggregate3",
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "name": "success",
+                        "internalType": "bool",
+                        "type": "bool"
+                    },
+                    {
+                        "name": "returnData",
+                        "internalType": "bytes",
+                        "type": "bytes"
+                    }
+                ],
+                "name": "returnData",
+                "internalType": "struct Multicall3.Result[]",
+                "type": "tuple[]"
+            }
+        ],
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "name": "target",
+                        "internalType": "address",
+                        "type": "address"
+                    },
+                    {
+                        "name": "allowFailure",
+                        "internalType": "bool",
+                        "type": "bool"
+                    },
+                    {
+                        "name": "value",
+                        "internalType": "uint256",
+                        "type": "uint256"
+                    },
+                    {
+                        "name": "callData",
+                        "internalType": "bytes",
+                        "type": "bytes"
+                    }
+                ],
+                "name": "calls",
+                "internalType": "struct Multicall3.Call3Value[]",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "aggregate3Value",
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "blockNumber",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "blockHash",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            },
+            {
+                "components": [
+                    {
+                        "name": "success",
+                        "internalType": "bool",
+                        "type": "bool"
+                    },
+                    {
+                        "name": "returnData",
+                        "internalType": "bytes",
+                        "type": "bytes"
+                    }
+                ],
+                "name": "returnData",
+                "internalType": "struct Multicall3.Result[]",
+                "type": "tuple[]"
+            }
+        ],
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "name": "target",
+                        "internalType": "address",
+                        "type": "address"
+                    },
+                    {
+                        "name": "callData",
+                        "internalType": "bytes",
+                        "type": "bytes"
+                    }
+                ],
+                "name": "calls",
+                "internalType": "struct Multicall3.Call[]",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "blockAndAggregate",
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "basefee",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [],
+        "name": "getBasefee",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "blockHash",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "blockNumber",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "name": "getBlockHash",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "blockNumber",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [],
+        "name": "getBlockNumber",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "chainid",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [],
+        "name": "getChainId",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "coinbase",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "getCurrentBlockCoinbase",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "difficulty",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [],
+        "name": "getCurrentBlockDifficulty",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "gaslimit",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [],
+        "name": "getCurrentBlockGasLimit",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "timestamp",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [],
+        "name": "getCurrentBlockTimestamp",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "balance",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "addr",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "name": "getEthBalance",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "blockHash",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            }
+        ],
+        "inputs": [],
+        "name": "getLastBlockHash",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "name": "success",
+                        "internalType": "bool",
+                        "type": "bool"
+                    },
+                    {
+                        "name": "returnData",
+                        "internalType": "bytes",
+                        "type": "bytes"
+                    }
+                ],
+                "name": "returnData",
+                "internalType": "struct Multicall3.Result[]",
+                "type": "tuple[]"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "requireSuccess",
+                "internalType": "bool",
+                "type": "bool"
+            },
+            {
+                "components": [
+                    {
+                        "name": "target",
+                        "internalType": "address",
+                        "type": "address"
+                    },
+                    {
+                        "name": "callData",
+                        "internalType": "bytes",
+                        "type": "bytes"
+                    }
+                ],
+                "name": "calls",
+                "internalType": "struct Multicall3.Call[]",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "tryAggregate",
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "blockNumber",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "blockHash",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            },
+            {
+                "components": [
+                    {
+                        "name": "success",
+                        "internalType": "bool",
+                        "type": "bool"
+                    },
+                    {
+                        "name": "returnData",
+                        "internalType": "bytes",
+                        "type": "bytes"
+                    }
+                ],
+                "name": "returnData",
+                "internalType": "struct Multicall3.Result[]",
+                "type": "tuple[]"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "requireSuccess",
+                "internalType": "bool",
+                "type": "bool"
+            },
+            {
+                "components": [
+                    {
+                        "name": "target",
+                        "internalType": "address",
+                        "type": "address"
+                    },
+                    {
+                        "name": "callData",
+                        "internalType": "bytes",
+                        "type": "bytes"
+                    }
+                ],
+                "name": "calls",
+                "internalType": "struct Multicall3.Call[]",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "tryBlockAndAggregate",
+        "stateMutability": "payable",
+        "type": "function"
+    }
+]

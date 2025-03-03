@@ -2,13 +2,13 @@ import { insertPointBatch } from '../db'
 import { dualCoreSnapshot } from './dual-core-snapshot'
 import { logger, persistLog } from '../logger'
 import fs from 'fs'
-import { checkSnapshotAtDate } from '../service/point.service'
+import { checkDualCoreSnapshotAtDate } from '../service/point.service'
 import { calculatePoints } from '../utils'
 
 const snapshotDataName = 'snapshot_data_'
 
 export async function snapshot(date: Date, block: number) {
-  const saved = await checkSnapshotAtDate(date)
+  const saved = await checkDualCoreSnapshotAtDate(date)
   if (saved) {
     logger.warn('dualCore Snapshot already saved at date', date.toUTCString())
     return

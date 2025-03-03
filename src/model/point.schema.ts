@@ -8,6 +8,7 @@ export interface IPoint {
   rewardBy?: string
   rewardType?: string // dualCore-holder
   time: Date
+  coreReward: string,
 }
 
 const SnapshotSchema = new mongoose.Schema<IPoint>(
@@ -15,8 +16,6 @@ const SnapshotSchema = new mongoose.Schema<IPoint>(
     holder: {
       type: String,
     },
-    rewardBy: String,
-    rewardType: String,
     point: Number,
     amount: String,
     type: String,
