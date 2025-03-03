@@ -95,6 +95,11 @@ spec:
                 secretKeyRef:
                   name: dual-core-snapshot
                   key: SAVE_POINT_PRIVATE_KEY
+            - name: TOTAL_ASSET_ONCHAIN_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: dual-core-snapshot
+                  key: TOTAL_ASSET_ONCHAIN_ADDRESS
           volumeMounts:
             - mountPath: "/home/node/app/volumes"
               name: dual-core-snapshot-volumes
