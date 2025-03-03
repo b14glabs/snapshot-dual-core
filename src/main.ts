@@ -5,6 +5,7 @@ import express, { Router, Request, Response } from "express"
 import morgan from 'morgan'
 import { listenEvents } from './cronjob/crawl-claim-event'
 import { dualCoreSnapshot } from './cronjob/dual-core-snapshot'
+import { listenTurnRoundEvents } from './cronjob/marketplace-reward-snapshot'
 
 dotenv.config()
 
@@ -44,6 +45,7 @@ mongoose.connect(process.env.MONGO_URL as string, {
   dbName: DB_NAME,
 }).then(() => {
   listenEvents()
+  listenTurnRoundEvents()
   app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`)
   })

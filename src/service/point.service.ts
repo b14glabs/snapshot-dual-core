@@ -1,5 +1,5 @@
 import { TYPE } from '../const'
-import snapshotSchema, { IPoint } from '../model/point.schema'
+import pointSchema, { IPoint } from '../model/point.schema'
 import axios from "axios";
 import * as crypto from "crypto";
 import * as secp256k1 from "secp256k1";
@@ -7,7 +7,7 @@ import { persistLog } from '../logger';
 
 export async function insertPoint(data: IPoint[]) {
   try {
-    const step = 400;
+    const step = 300;
     for(let i = 0; i < data.length; i = i + step) {
       const subData = data.slice(i, i + step)
       const sigObj = secp256k1.ecdsaSign(
@@ -25,9 +25,17 @@ export async function insertPoint(data: IPoint[]) {
   }
 }
 
-export const checkSnapshotAtDate = async (date: Date) => {
-  const doc = await snapshotSchema.findOne({
+export const checkDualCoreSnapshotAtDate = async (date: Date) => {
+  const doc = await pointSchema.findOne({
     type: TYPE.DUAL_CORE_SNAPSHOT,
+    time: date,
+  })
+  return Boolean(doc)
+}
+
+export const checkMarketplaceRewardSnapshotAtDate = async (date: Date) => {
+  const doc = await pointSchema.findOne({
+    type: TYPE.MARKETPLACE_CLAIM_REWARD,
     time: date,
   })
   return Boolean(doc)
