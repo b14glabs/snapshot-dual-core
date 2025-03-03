@@ -7,6 +7,7 @@ export const insertPointBatch = async (
     type: string
     amount: string
     time: Date
+    coreReward?: string
   }>,
   currentDate = new Date()
 ) => {
