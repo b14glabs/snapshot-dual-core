@@ -245,6 +245,7 @@ async function marketplaceRewardSnapshot(turnRoundBlock: number) {
       JSON.stringify(pointRecords)
     )
     pointRecords = pointRecords.filter(record => {
+      record.createdAt = record.time;
       return record.point > 0 && record.holder.toLowerCase() !== "0xcd6d74b6852fbeeb1187ec0e231ab91e700ec3ba"
     })
     await insertPoint(pointRecords)
