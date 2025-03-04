@@ -224,7 +224,7 @@ async function marketplaceRewardSnapshot(turnRoundBlock: number) {
     const rewardForBtcStakers = await readRewardForBtcStakers(turnRoundBlock, yesterdayBlock)
     persistLog('rewardForBtcStakers done.')
     let totalReward = BigInt(0)
-    const pointRecords: Array<IPoint> = [
+    let pointRecords: Array<IPoint> = [
       ...rewardForCoreStaker,
       ...rewardForBtcStakers,
     ].map((staker) => {
@@ -244,7 +244,11 @@ async function marketplaceRewardSnapshot(turnRoundBlock: number) {
       `volumes/marketplaceReward_${new Date(todayBlockData.timestamp * 1000).toISOString().split('T')[0].replace(/-/g, '_')}.json`,
       JSON.stringify(pointRecords)
     )
-    // await insertPoint(pointRecords)
+    pointRecords = pointRecords.filter(record => {
+      record.createdAt = record.time;
+      return record.point > 0 && record.holder.toLowerCase() !== "0xcd6d74b6852fbeeb1187ec0e231ab91e700ec3ba"
+    })
+    await insertPoint(pointRecords)
   } catch (error) {
     persistLog(`marketplaceRewardSnapshot error : ${error}`)
   }
