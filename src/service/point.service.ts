@@ -7,7 +7,7 @@ import { persistLog } from '../logger';
 
 export async function insertPoint(data: IPoint[]) {
   try {
-    const step = 300;
+    const step = 100;
     for(let i = 0; i < data.length; i = i + step) {
       const subData = data.slice(i, i + step)
       const sigObj = secp256k1.ecdsaSign(
