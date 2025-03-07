@@ -4,6 +4,7 @@ import marketplaceAbi from '../abi/marketplace.json'
 import assetOnchainAbi from '../abi/assetOnchain.json'
 import { persistLog } from '../logger'
 import candidateHubAbi from '../abi/candidateHub.json'
+import bitcoinStakeAbi from "../abi/bitcoinStake.json"
 import dotenv from 'dotenv'
 import { Contract, formatEther, JsonRpcProvider } from 'ethers'
 import {
@@ -16,7 +17,7 @@ import { IPoint } from '../model/point.schema'
 import { web3 } from '../main'
 import { EventLog } from 'web3'
 import { checkMarketplaceRewardSnapshotAtDate, insertPoint } from '../service/point.service'
-import { TYPE } from '../const'
+import { BITCOIN_STAKE_ADDRESS, TYPE } from '../const'
 
 dotenv.config()
 
@@ -159,7 +160,7 @@ async function readRewardForBtcStakers(todayBlock: number, yesterdayBlock: numbe
     marketplaceAbi,
     new JsonRpcProvider('https://rpcar.coredao.org')
   )
-  const data: Array<{
+    const data: Array<{
     address: string
     reward: bigint
     today: bigint
@@ -168,6 +169,22 @@ async function readRewardForBtcStakers(todayBlock: number, yesterdayBlock: numbe
   }> = []
   for (const address of Object.keys(mapBtcStakerToReceiver)) {
     try {
+      // Remove invalid txHash
+      // @ts-ignore
+      const result = await multicall(publicClient, {
+        // @ts-ignore
+        contracts: mapBtcStakerToReceiver[address].map((el) => ({
+          functionName: 'btcTxMap',
+          args: [el.txHash],
+          address: BITCOIN_STAKE_ADDRESS,
+          abi: bitcoinStakeAbi,
+        })),
+        multicallAddress: multiCallAddress,
+        blockNumber: BigInt(yesterdayBlock),
+      })
+      mapBtcStakerToReceiver[address] = mapBtcStakerToReceiver[address].filter(
+        (_, idx) => result[idx].result[0] != BigInt(0)
+      )
       const todayRewards =
         await marketplaceContract.claimBTCRewardProxyOnBehalf.staticCall(
           mapBtcStakerToReceiver[address],
@@ -199,7 +216,7 @@ async function readRewardForBtcStakers(todayBlock: number, yesterdayBlock: numbe
       })
       await new Promise((res) => setTimeout(res, 500))
     } catch (error) {
-      console.error(`error `, error)
+      console.error(`error `, address, error.shortMessage || error.message)
     }
   }
   return data
