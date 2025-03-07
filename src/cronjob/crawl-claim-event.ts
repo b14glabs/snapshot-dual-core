@@ -51,6 +51,6 @@ export async function listenEvents() {
   } finally {
     setTimeout(() => {
       listenEvents()
-    }, 30000)
+    }, 60000 * 3)
   }
 }

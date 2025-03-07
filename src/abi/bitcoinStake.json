@@ -1,0 +1,1068 @@
+[
+    {
+        "inputs": [
+            {
+                "name": "candidate",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "name": "InactiveCandidate",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "name": "name",
+                "internalType": "string",
+                "type": "string"
+            }
+        ],
+        "name": "MismatchParamLength",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "name": "name",
+                "internalType": "string",
+                "type": "string"
+            },
+            {
+                "name": "given",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "lowerBound",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "upperBound",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "name": "OutOfBounds",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "name": "key",
+                "internalType": "string",
+                "type": "string"
+            }
+        ],
+        "name": "UnsupportedGovParam",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "txid",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            },
+            {
+                "indexed": true,
+                "name": "delegator",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "name": "btcExpired",
+        "anonymous": false,
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "txid",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            },
+            {
+                "indexed": false,
+                "name": "reward",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "expired",
+                "internalType": "bool",
+                "type": "bool"
+            },
+            {
+                "indexed": false,
+                "name": "accStakedAmount",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "unclaimedReward",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "name": "claimedRewardPerTx",
+        "anonymous": false,
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "txid",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            },
+            {
+                "indexed": true,
+                "name": "candidate",
+                "internalType": "address",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "delegator",
+                "internalType": "address",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "script",
+                "internalType": "bytes",
+                "type": "bytes"
+            },
+            {
+                "indexed": false,
+                "name": "outputIndex",
+                "internalType": "uint32",
+                "type": "uint32"
+            },
+            {
+                "indexed": false,
+                "name": "amount",
+                "internalType": "uint64",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "name": "fee",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "name": "delegated",
+        "anonymous": false,
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "key",
+                "internalType": "string",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "name": "value",
+                "internalType": "bytes",
+                "type": "bytes"
+            }
+        ],
+        "name": "paramChange",
+        "anonymous": false,
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "txid",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            },
+            {
+                "indexed": false,
+                "name": "reward",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "expired",
+                "internalType": "bool",
+                "type": "bool"
+            },
+            {
+                "indexed": false,
+                "name": "accStakedAmount",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "unclaimedReward",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "name": "storedRewardPerTx",
+        "anonymous": false,
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "txid",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            },
+            {
+                "indexed": false,
+                "name": "sourceCandidate",
+                "internalType": "address",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "targetCandidate",
+                "internalType": "address",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "delegator",
+                "internalType": "address",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "amount",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "name": "transferredBtc",
+        "anonymous": false,
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "outpointHash",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            },
+            {
+                "indexed": true,
+                "name": "outpointIndex",
+                "internalType": "uint32",
+                "type": "uint32"
+            },
+            {
+                "indexed": false,
+                "name": "usedTxid",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            }
+        ],
+        "name": "undelegated",
+        "anonymous": false,
+        "type": "event"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "BTCLST_STAKE_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "BTCLST_TOKEN_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "BTC_AGENT_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "BTC_STAKE_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "BURN_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "CANDIDATE_HUB_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "CORE_AGENT_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "FOUNDATION_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "GOV_HUB_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "HASH_AGENT_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "LIGHT_CLIENT_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "PLEDGE_AGENT_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "RELAYER_HUB_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "SLASH_CONTRACT_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "STAKE_HUB_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "SYSTEM_REWARD_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "inputs": [],
+        "name": "VALIDATOR_CONTRACT_ADDR",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            },
+            {
+                "name": "",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "name": "accruedRewardPerBTCMap",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "bool",
+                "type": "bool"
+            }
+        ],
+        "inputs": [],
+        "name": "alreadyInit",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "uint32",
+                "type": "uint32"
+            }
+        ],
+        "inputs": [],
+        "name": "btcConfirmBlock",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "amount",
+                "internalType": "uint64",
+                "type": "uint64"
+            },
+            {
+                "name": "outputIndex",
+                "internalType": "uint32",
+                "type": "uint32"
+            },
+            {
+                "name": "blockTimestamp",
+                "internalType": "uint64",
+                "type": "uint64"
+            },
+            {
+                "name": "lockTime",
+                "internalType": "uint32",
+                "type": "uint32"
+            },
+            {
+                "name": "usedHeight",
+                "internalType": "uint32",
+                "type": "uint32"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            }
+        ],
+        "name": "btcTxMap",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "stakedAmount",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "realtimeAmount",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "name": "candidateMap",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "reward",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "rewardUnclaimed",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "accStakedAmount",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "delegator",
+                "internalType": "address",
+                "type": "address"
+            },
+            {
+                "name": "settleRound",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "claim",
+                "internalType": "bool",
+                "type": "bool"
+            }
+        ],
+        "name": "claimReward",
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "outputs": [],
+        "inputs": [
+            {
+                "name": "btcTx",
+                "internalType": "bytes",
+                "type": "bytes"
+            },
+            {
+                "name": "blockHeight",
+                "internalType": "uint32",
+                "type": "uint32"
+            },
+            {
+                "name": "nodes",
+                "internalType": "bytes32[]",
+                "type": "bytes32[]"
+            },
+            {
+                "name": "index",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "script",
+                "internalType": "bytes",
+                "type": "bytes"
+            }
+        ],
+        "name": "delegate",
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "outputs": [],
+        "inputs": [
+            {
+                "name": "validators",
+                "internalType": "address[]",
+                "type": "address[]"
+            },
+            {
+                "name": "rewardList",
+                "internalType": "uint256[]",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "distributeReward",
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "uint256[]",
+                "type": "uint256[]"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "candidate",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "name": "getContinuousRewardEndRoundsByCandidate",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "round",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "agent",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "name": "getExpireValue",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "name": "lockDuration",
+                        "internalType": "uint64",
+                        "type": "uint64"
+                    },
+                    {
+                        "name": "percentage",
+                        "internalType": "uint32",
+                        "type": "uint32"
+                    }
+                ],
+                "name": "",
+                "internalType": "struct BitcoinStake.LockLengthGrade[]",
+                "type": "tuple[]"
+            }
+        ],
+        "inputs": [],
+        "name": "getGrades",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "amounts",
+                "internalType": "uint256[]",
+                "type": "uint256[]"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "candidates",
+                "internalType": "address[]",
+                "type": "address[]"
+            }
+        ],
+        "name": "getStakeAmounts",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "bytes32[]",
+                "type": "bytes32[]"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "delegator",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "name": "getTxIdsByDelegator",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "bool",
+                "type": "bool"
+            }
+        ],
+        "inputs": [],
+        "name": "gradeActive",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "lockDuration",
+                "internalType": "uint64",
+                "type": "uint64"
+            },
+            {
+                "name": "percentage",
+                "internalType": "uint32",
+                "type": "uint32"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "name": "grades",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [],
+        "inputs": [],
+        "name": "init",
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "outputs": [],
+        "inputs": [
+            {
+                "name": "round",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "name": "prepare",
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "candidate",
+                "internalType": "address",
+                "type": "address"
+            },
+            {
+                "name": "delegator",
+                "internalType": "address",
+                "type": "address"
+            },
+            {
+                "name": "round",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            }
+        ],
+        "name": "receiptMap",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "reward",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "unclaimedReward",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "accStakedAmount",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "name": "rewardMap",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [],
+        "name": "roundTag",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "outputs": [],
+        "inputs": [
+            {
+                "name": "validators",
+                "internalType": "address[]",
+                "type": "address[]"
+            },
+            {
+                "name": "round",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "name": "setNewRound",
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "outputs": [],
+        "inputs": [
+            {
+                "name": "txid",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            },
+            {
+                "name": "targetCandidate",
+                "internalType": "address",
+                "type": "address"
+            }
+        ],
+        "name": "transfer",
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "outputs": [],
+        "inputs": [
+            {
+                "name": "btcTx",
+                "internalType": "bytes",
+                "type": "bytes"
+            },
+            {
+                "name": "blockHeight",
+                "internalType": "uint32",
+                "type": "uint32"
+            },
+            {
+                "name": "nodes",
+                "internalType": "bytes32[]",
+                "type": "bytes32[]"
+            },
+            {
+                "name": "index",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "name": "undelegate",
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "outputs": [],
+        "inputs": [
+            {
+                "name": "key",
+                "internalType": "string",
+                "type": "string"
+            },
+            {
+                "name": "value",
+                "internalType": "bytes",
+                "type": "bytes"
+            }
+        ],
+        "name": "updateParam",
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "outputs": [
+            {
+                "name": "reward",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "expired",
+                "internalType": "bool",
+                "type": "bool"
+            },
+            {
+                "name": "rewardUnclaimed",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "accStakedAmount",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "txid",
+                "internalType": "bytes32",
+                "type": "bytes32"
+            },
+            {
+                "name": "drRound",
+                "internalType": "uint256",
+                "type": "uint256"
+            },
+            {
+                "name": "settleRound",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "name": "viewCollectReward",
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]
