@@ -312,36 +312,55 @@ async function readCoreRewards({
   if (userStakedOrderResult.length != usersAddress.length) {
     throw 'Leng mis match userStakedOrderResult.length != usersAddress.length'
   }
+  let chunkSize = []
   for (let i = 0; i < usersAddress.length; i++) {
-    getMarketplaceRewardCalls.push({
-      functionName: 'getMarketplaceReward',
-      args: [usersAddress[i], userStakedOrderResult[i]],
-      address: totalAssetAddress,
-      abi: assetOnchainAbi,
-    })
-    //   Todo:
+    if (userStakedOrderResult[i].length) {
+      chunkSize.push(userStakedOrderResult[i].length)
+      for (let j = 0; j < userStakedOrderResult[i].length; j = j + 5) {
+        getMarketplaceRewardCalls.push({
+          functionName: 'getMarketplaceReward',
+          args: [usersAddress[i], userStakedOrderResult[i].slice(j, j + 5)],
+          address: totalAssetAddress,
+          abi: assetOnchainAbi,
+        })
+      }
+    } else {
+      chunkSize.push(1)
+      getMarketplaceRewardCalls.push({
+        functionName: 'getMarketplaceReward',
+        args: [usersAddress[i], userStakedOrderResult[i]],
+        address: totalAssetAddress,
+        abi: assetOnchainAbi,
+      })
+    }
     if (
       getMarketplaceRewardCalls.length >= step ||
       usersAddress.length - i < step
     ) {
-      // @ts-ignore
-      const result = await multicall(publicClient, {
+    // @ts-ignore
+    let result = await multicall(publicClient, {
         contracts: getMarketplaceRewardCalls as any,
-        multicallAddress: multiCallAddress,
-        // allowFailure: true,
-        blockNumber: BigInt(blockNumber),
-        batchSize: 4096,
+      multicallAddress: multiCallAddress,
+      // allowFailure: true,
+      blockNumber: BigInt(blockNumber),
+      batchSize: 4096,
       })
-
-      rewards = rewards.concat(
-        result.map((el, idx) => {
+      let pointer = 0;
+      const reward = chunkSize.map(size => {
+        const res = result.slice(pointer, size)
+        pointer += size;
+        return res.reduce((acc, cur) => acc + (cur.result as bigint), BigInt(0))
+      })
+    rewards = rewards.concat(
+      reward.map((el, idx) => {
           return {
-            reward: el.result || BigInt(0),
+            reward: el || BigInt(0),
             userStakedData: getMarketplaceRewardCalls[idx].args[1],
           }
         })
       )
       getMarketplaceRewardCalls = []
+      chunkSize = []
     }
   }
   if (rewards.length != usersAddress.length) {
