@@ -311,8 +311,7 @@ async function fetchUserStakedOrders(
       const result = await multicall(publicClient, {
         contracts: userStakedOrder as any,
         multicallAddress: multiCallAddress,
-        blockNumber: BigInt(blockNumber),
-        batchSize: 4096,
+        blockNumber: BigInt(blockNumber)
       }) as any;
       
       userStakedOrderResult = userStakedOrderResult.concat(
@@ -372,7 +371,6 @@ async function fetchMarketplaceRewards(
         contracts: getMarketplaceRewardCalls as any,
         multicallAddress: multiCallAddress,
         blockNumber: BigInt(blockNumber),
-        batchSize: 4096,
       });
       
       let resultIndex = 0;
