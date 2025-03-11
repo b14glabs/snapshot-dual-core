@@ -101,8 +101,7 @@ export async function listenTurnRoundEvents() {
 
 async function readRewardForCoreStakers(todayBlock: number, yesterdayBlock: number) {
   const coreStakers = Array.from(
-    new Set((await findAllCoreStaker()).map((el) => el.toLowerCase()))
-  )
+    new Set((await findAllCoreStaker()).map((el) => el.toLowerCase())))
   const todayReward = await readCoreRewards({
     blockNumber: todayBlock,
     usersAddress: coreStakers,
@@ -142,7 +141,11 @@ async function readRewardForCoreStakers(todayBlock: number, yesterdayBlock: numb
 
 async function readRewardForBtcStakers(todayBlock: number, yesterdayBlock: number) {
   const btcStakers = await findAllBtcStaker()
-  const mapBtcStakerToReceiver = {}
+  const mapBtcStakerToReceiver: Record<string, Array<{
+    receiver: string,
+    txHash: string,
+    to: string
+  }>> = {}
   btcStakers.forEach((item) => {
     const data = {
       receiver: item.rewardReceiver,
@@ -158,9 +161,9 @@ async function readRewardForBtcStakers(todayBlock: number, yesterdayBlock: numbe
   const marketplaceContract = new Contract(
     marketplaceAddress,
     marketplaceAbi,
-    new JsonRpcProvider('https://rpcar.coredao.org')
+    jsonRpc
   )
-    const data: Array<{
+  const data: Array<{
     address: string
     reward: bigint
     today: bigint
@@ -172,41 +175,39 @@ async function readRewardForBtcStakers(todayBlock: number, yesterdayBlock: numbe
       // Remove invalid txHash
       // @ts-ignore
       const result = await multicall(publicClient, {
-        // @ts-ignore
         contracts: mapBtcStakerToReceiver[address].map((el) => ({
           functionName: 'btcTxMap',
           args: [el.txHash],
           address: BITCOIN_STAKE_ADDRESS,
           abi: bitcoinStakeAbi,
-        })),
+        })) as any,
         multicallAddress: multiCallAddress,
         blockNumber: BigInt(yesterdayBlock),
-      })
+      }) as any
       mapBtcStakerToReceiver[address] = mapBtcStakerToReceiver[address].filter(
         (_, idx) => result[idx].result[0] != BigInt(0)
       )
-      const todayRewards =
-        await marketplaceContract.claimBTCRewardProxyOnBehalf.staticCall(
+      const todayReward =
+        (await marketplaceContract.claimBTCRewardProxyOnBehalf.staticCall(
           mapBtcStakerToReceiver[address],
           {
             blockTag: todayBlock,
           }
-        )
-      const yesterdayRewards =
-        await marketplaceContract.claimBTCRewardProxyOnBehalf.staticCall(
+        )).reduce(
+          (acc: bigint, cur: bigint) => acc + cur,
+          BigInt(0)
+        ) as bigint
+
+      const yesterdayReward =
+        (await marketplaceContract.claimBTCRewardProxyOnBehalf.staticCall(
           mapBtcStakerToReceiver[address],
           {
             blockTag: yesterdayBlock,
           }
-        )
-      const todayReward = todayRewards.reduce(
-        (acc, cur) => acc + cur,
-        BigInt(0)
-      ) as bigint
-      const yesterdayReward = yesterdayRewards.reduce(
-        (acc, cur) => acc + cur,
-        BigInt(0)
-      ) as bigint
+        )).reduce(
+          (acc: bigint, cur: bigint) => acc + cur,
+          BigInt(0)
+        ) as bigint
       data.push({
         address,
         reward: todayReward - yesterdayReward,
@@ -263,6 +264,7 @@ async function marketplaceRewardSnapshot(turnRoundBlock: number) {
     )
     pointRecords = pointRecords.filter(record => {
       record.createdAt = record.time;
+      // ignore point for vault contract
       return record.point > 0 && record.holder.toLowerCase() !== "0xcd6d74b6852fbeeb1187ec0e231ab91e700ec3ba"
     })
     await insertPoint(pointRecords)
@@ -278,93 +280,123 @@ async function readCoreRewards({
   usersAddress: Array<string>
   blockNumber: number
 }) {
-  const step = Math.min(5, usersAddress.length)
-  let userStakedOrder = []
-  let userStakedOrderResult = []
+  const batchSize = Math.min(5, usersAddress.length);
+  const userStakedOrderResults = await fetchUserStakedOrders(usersAddress, blockNumber, batchSize);
+  const rewards = await fetchMarketplaceRewards(usersAddress, userStakedOrderResults, blockNumber, batchSize);
+  
+  if (rewards.length !== usersAddress.length) {
+    throw new Error('Length mismatch: rewards.length != usersAddress.length');
+  }
+  
+  return rewards;
+}
 
+async function fetchUserStakedOrders(
+  usersAddress: Array<string>,
+  blockNumber: number,
+  batchSize: number
+) {
+  let userStakedOrder = [];
+  let userStakedOrderResult = [];
+  
   for (let i = 0; i < usersAddress.length; i++) {
     userStakedOrder.push({
       functionName: 'getUserStakedOrder',
       args: [usersAddress[i]],
       address: totalAssetAddress,
       abi: assetOnchainAbi,
-    })
-    //   Todo: 
-    if (userStakedOrder.length >= step || usersAddress.length - i < step) {
-      // @ts-ignore
+    });
+    
+    if (userStakedOrder.length >= batchSize || i === usersAddress.length - 1) {
       const result = await multicall(publicClient, {
         contracts: userStakedOrder as any,
         multicallAddress: multiCallAddress,
-        //   allowFailure: true,
         blockNumber: BigInt(blockNumber),
         batchSize: 4096,
-      })
+      }) as any;
+      
       userStakedOrderResult = userStakedOrderResult.concat(
-        result.map((el) => {
-          return el.result
-        })
-      )
-      userStakedOrder = []
+        result.map((el) => el.result)
+      );
+      
+      userStakedOrder = [];
     }
   }
-  let getMarketplaceRewardCalls = []
-  let rewards = []
-  if (userStakedOrderResult.length != usersAddress.length) {
-    throw 'Leng mis match userStakedOrderResult.length != usersAddress.length'
+  
+  if (userStakedOrderResult.length !== usersAddress.length) {
+    throw new Error('Length mismatch: userStakedOrderResult.length != usersAddress.length');
   }
-  let chunkSize = []
+  
+  return userStakedOrderResult;
+}
+
+async function fetchMarketplaceRewards(
+  usersAddress: Array<string>,
+  userStakedOrderResults: any[],
+  blockNumber: number,
+  batchSize: number
+) {
+  let getMarketplaceRewardCalls = [];
+  let rewards = [];
+  let chunkSizes = [];
+  let processedUsers = 0;
+  
   for (let i = 0; i < usersAddress.length; i++) {
-    if (userStakedOrderResult[i].length) {
-      chunkSize.push(userStakedOrderResult[i].length)
-      for (let j = 0; j < userStakedOrderResult[i].length; j = j + 5) {
+    const stakedOrders = userStakedOrderResults[i];
+    
+    if (stakedOrders.length) {
+      for (let j = 0; j < stakedOrders.length; j += 5) {
+        const orderChunk = stakedOrders.slice(j, j + 5);
         getMarketplaceRewardCalls.push({
           functionName: 'getMarketplaceReward',
-          args: [usersAddress[i], userStakedOrderResult[i].slice(j, j + 5)],
+          args: [usersAddress[i], orderChunk],
           address: totalAssetAddress,
           abi: assetOnchainAbi,
-        })
+        });
+        
+        if (j === 0) chunkSizes.push({ userId: i, chunks: Math.ceil(stakedOrders.length / 5) });
       }
     } else {
-      chunkSize.push(1)
       getMarketplaceRewardCalls.push({
         functionName: 'getMarketplaceReward',
-        args: [usersAddress[i], userStakedOrderResult[i]],
+        args: [usersAddress[i], stakedOrders],
         address: totalAssetAddress,
         abi: assetOnchainAbi,
-      })
+      });
+      
+      chunkSizes.push({ userId: i, chunks: 1 });
     }
-    if (
-      getMarketplaceRewardCalls.length >= step ||
-      usersAddress.length - i < step
-    ) {
-    // @ts-ignore
-    let result = await multicall(publicClient, {
+    
+    if (getMarketplaceRewardCalls.length >= batchSize || i === usersAddress.length - 1) {
+      const result = await multicall(publicClient, {
         contracts: getMarketplaceRewardCalls as any,
-      multicallAddress: multiCallAddress,
-      // allowFailure: true,
-      blockNumber: BigInt(blockNumber),
-      batchSize: 4096,
-      })
-      let pointer = 0;
-      const reward = chunkSize.map(size => {
-        const res = result.slice(pointer, size)
-        pointer += size;
-        return res.reduce((acc, cur) => acc + (cur.result as bigint), BigInt(0))
-      })
-    rewards = rewards.concat(
-      reward.map((el, idx) => {
-          return {
-            reward: el || BigInt(0),
-            userStakedData: getMarketplaceRewardCalls[idx].args[1],
-          }
-        })
-      )
-      getMarketplaceRewardCalls = []
-      chunkSize = []
+        multicallAddress: multiCallAddress,
+        blockNumber: BigInt(blockNumber),
+        batchSize: 4096,
+      });
+      
+      let resultIndex = 0;
+      for (const { userId, chunks } of chunkSizes) {
+        let totalReward = BigInt(0);
+        const userChunkResults = result.slice(resultIndex, resultIndex + chunks);
+        resultIndex += chunks;
+        
+        for (const chunkResult of userChunkResults) {
+          totalReward += (chunkResult.result as bigint) || BigInt(0);
+        }
+        
+        rewards[userId] = {
+          reward: totalReward,
+          userStakedData: userStakedOrderResults[userId],
+        };
+        
+        processedUsers++;
+      }
+      
+      getMarketplaceRewardCalls = [];
+      chunkSizes = [];
     }
   }
-  if (rewards.length != usersAddress.length) {
-    throw 'Leng mis match rewards.length != usersAddress.length'
-  }
-  return rewards
+  
+  return rewards;
 }
