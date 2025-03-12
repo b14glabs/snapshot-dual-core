@@ -217,7 +217,7 @@ async function readRewardForBtcStakers(todayBlock: number, yesterdayBlock: numbe
         type: 'rewardForBtc',
         yesterday: yesterdayReward,
       })
-      sleep(500)
+      await sleep(500)
     } catch (error) {
       console.error(`error `, address, error.shortMessage || error.message)
     }
