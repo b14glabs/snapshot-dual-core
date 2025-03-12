@@ -20,7 +20,9 @@ import { checkMarketplaceRewardSnapshotAtDate, insertPoint } from '../service/po
 import { BITCOIN_STAKE_ADDRESS, TYPE } from '../const'
 
 dotenv.config()
-
+async function sleep(ms: number) {
+  await new Promise((res) => setTimeout(res, ms))
+}
 const archiveRpc = 'https://rpcar.coredao.org'
 export const archiveCoreDao = /*#__PURE__*/ defineChain({
   id: 1116,
@@ -215,7 +217,7 @@ async function readRewardForBtcStakers(todayBlock: number, yesterdayBlock: numbe
         type: 'rewardForBtc',
         yesterday: yesterdayReward,
       })
-      await new Promise((res) => setTimeout(res, 500))
+      sleep(500)
     } catch (error) {
       console.error(`error `, address, error.shortMessage || error.message)
     }
@@ -308,6 +310,7 @@ async function fetchUserStakedOrders(
     });
     
     if (userStakedOrder.length >= batchSize || i === usersAddress.length - 1) {
+      await sleep(100)
       const result = await multicall(publicClient, {
         contracts: userStakedOrder as any,
         multicallAddress: multiCallAddress,
@@ -317,7 +320,6 @@ async function fetchUserStakedOrders(
       userStakedOrderResult = userStakedOrderResult.concat(
         result.map((el) => el.result)
       );
-      
       userStakedOrder = [];
     }
   }
@@ -367,6 +369,7 @@ async function fetchMarketplaceRewards(
     }
     
     if (getMarketplaceRewardCalls.length >= batchSize || i === usersAddress.length - 1) {
+      await sleep(100)
       const result = await multicall(publicClient, {
         contracts: getMarketplaceRewardCalls as any,
         multicallAddress: multiCallAddress,
