@@ -272,6 +272,10 @@ async function marketplaceRewardSnapshot(turnRoundBlock: number) {
     await insertPoint(pointRecords)
   } catch (error) {
     persistLog(`marketplaceRewardSnapshot error : ${error}`)
+    if (error.toString().includes("TypeError: Cannot read properties of undefined")) {
+      await sleep(60000)
+      await marketplaceRewardSnapshot(turnRoundBlock)
+    }
   }
 }
 
