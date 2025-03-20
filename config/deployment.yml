@@ -16,7 +16,7 @@ spec:
     required:
       nodeSelectorTerms:
         - matchExpressions:
-            - key: persistent_data
+            - key: persistent_data2
               operator: In
               values:
                 - all
