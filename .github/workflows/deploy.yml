@@ -32,7 +32,7 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 x3chain-testnet
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 b14g
 
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml

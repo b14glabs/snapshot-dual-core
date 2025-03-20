@@ -11,7 +11,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: general-storage-class
   local:
-    path: /data/dual-core-snapshot
+    path: /mnt/dual-core-snapshot
   nodeAffinity:
     required:
       nodeSelectorTerms:
