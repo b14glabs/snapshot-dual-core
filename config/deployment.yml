@@ -100,6 +100,11 @@ spec:
                 secretKeyRef:
                   name: dual-core-snapshot
                   key: TOTAL_ASSET_ONCHAIN_ADDRESS
+            - name: SUBGRAPH_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: dual-core-snapshot
+                  key: SUBGRAPH_ENDPOINT
           volumeMounts:
             - mountPath: "/home/node/app/volumes"
               name: dual-core-snapshot-volumes

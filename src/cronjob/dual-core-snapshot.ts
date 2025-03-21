@@ -17,6 +17,16 @@ type KnownTypes = Record<
   }
 >
 
+interface User {
+  id: string,
+  dualCoreBalance: string
+}
+interface SubgraphResponse {
+  data: {
+    users: User[]
+  }
+}
+
 export interface Account {
   balance: number
   type: AccountType
@@ -49,38 +59,77 @@ async function saveAddresses(
 
 export const dualCoreSnapshot = async (date: Date, block: number): Promise<DualCoreSnapshotData[]> => {
   try {
-    const { addresses, fromBlock } = await crawlAddress()
-    persistLog(`Snapshot from block ${fromBlock}`)
-    const balances = await getBlanceOfBatch(addresses, block)
-    await saveAddresses(balances)
-
-    const balancesWithType = (await addType(balances)) as Record<
-      string,
-      {
-        balance: bigint
-        type: 'wallet' | 'contract'
-      }
-    >
-    const records = Object.keys(balancesWithType)
-      .map((wallet) => {
-        if (
-          balancesWithType[wallet].balance != BigInt(0)
-        ) {
-          return {
-            holder: wallet.toLowerCase(),
-            amount: balancesWithType[wallet].balance.toString(),
-            type: TYPE.DUAL_CORE_SNAPSHOT,
-            time: date,
+    persistLog(`Snapshot at block ${block}`);
+    const result: User[] = []
+    let data: SubgraphResponse;
+    let skip = 0;
+    do {
+      const res = await fetch(process.env.SUBGRAPH_ENDPOINT, {
+        method: "POST",
+        headers: {
+          'accept-language': 'en-US,en;q=0.9',
+          'content-type': 'application/json',
+          'origin': 'https://thegraph.coredao.org',
+        },
+        body: JSON.stringify({
+          "query": `query MyQuery {\n  users(\n    first: 1000\n    skip: ${skip}\n    block: {number: ${block}}\n    where: {dualCoreBalance_gt: 0}\n  ) {\n    dualCoreBalance\n    id\n  }\n}`,
+          "variables": null,
+          "extensions": {
+            "headers": null
           }
-        }
+        }),
       })
-      .filter((record) => record != undefined)
-    return records
+      if(res.status !== 200) throw `Call to subgraph failed, ${res.status}`
+      data = await res.json() as SubgraphResponse;
+      result.push(...data.data.users)
+      skip += 1000;
+    } while (data.data.users.length > 0)
+    return result.map(el => ({
+      amount: el.dualCoreBalance,
+      holder: el.id,
+      time: date,
+      type: TYPE.DUAL_CORE_SNAPSHOT
+    }))
   } catch (error) {
-    logger.info(`dualCore snapshot : ${error}`)
+    persistLog(`dualCore snapshot : ${error}`)
     return undefined
   }
 }
+
+// export const dualCoreSnapshot = async (date: Date, block: number): Promise<DualCoreSnapshotData[]> => {
+//   try {
+//     const { addresses, fromBlock } = await crawlAddress()
+//     persistLog(`Snapshot from block ${fromBlock}`)
+//     const balances = await getBlanceOfBatch(addresses, block)
+//     await saveAddresses(balances)
+
+//     const balancesWithType = (await addType(balances)) as Record<
+//       string,
+//       {
+//         balance: bigint
+//         type: 'wallet' | 'contract'
+//       }
+//     >
+//     const records = Object.keys(balancesWithType)
+//       .map((wallet) => {
+//         if (
+//           balancesWithType[wallet].balance != BigInt(0)
+//         ) {
+//           return {
+//             holder: wallet.toLowerCase(),
+//             amount: balancesWithType[wallet].balance.toString(),
+//             type: TYPE.DUAL_CORE_SNAPSHOT,
+//             time: date,
+//           }
+//         }
+//       })
+//       .filter((record) => record != undefined)
+//     return records
+//   } catch (error) {
+//     logger.info(`dualCore snapshot : ${error}`)
+//     return undefined
+//   }
+// }
 
 const getBlanceOfBatch = async (
   addresses: string[],
