@@ -4,9 +4,10 @@ import marketplaceAbi from '../abi/marketplace.json'
 import assetOnchainAbi from '../abi/assetOnchain.json'
 import { persistLog } from '../logger'
 import candidateHubAbi from '../abi/candidateHub.json'
-import bitcoinStakeAbi from "../abi/bitcoinStake.json"
+import bitcoinStakeAbi from '../abi/bitcoinStake.json'
+import receiverAbi from '../abi/receiver.json'
 import dotenv from 'dotenv'
-import { Contract, formatEther, JsonRpcProvider } from 'ethers'
+import { Contract, ethers, formatEther, JsonRpcProvider } from 'ethers'
 import {
   findAllBtcStaker,
   findAllCoreStaker,
@@ -16,7 +17,10 @@ import { defineChain } from 'viem'
 import { IPoint } from '../model/point.schema'
 import { web3 } from '../main'
 import { EventLog } from 'web3'
-import { checkMarketplaceRewardSnapshotAtDate, insertPoint } from '../service/point.service'
+import {
+  checkMarketplaceRewardSnapshotAtDate,
+  insertPoint,
+} from '../service/point.service'
 import { BITCOIN_STAKE_ADDRESS, TYPE } from '../const'
 
 dotenv.config()
@@ -123,17 +127,17 @@ async function readRewardForCoreStakers(todayBlock: number, yesterdayBlock: numb
   for (let i = 0; i < todayReward.length; i++) {
     data.push({
       address: coreStakers[i],
-      today: todayReward[i].reward.toString(),
-      yesterday: previousReward[i].reward.toString(),
-      reward: (todayReward[i].reward - previousReward[i].reward).toString(),
+      today: todayReward[i].toString(),
+      yesterday: previousReward[i].toString(),
+      reward: (todayReward[i] - previousReward[i]).toString(),
       type: 'rewardForCore',
     })
     if (todayReward[i] < previousReward[i]) {
       console.log({
         address: coreStakers[i],
-        today: todayReward[i].reward.toString(),
-        yesterday: previousReward[i].reward.toString(),
-        reward: (todayReward[i].reward - previousReward[i].reward).toString(),
+        today: todayReward[i].toString(),
+        yesterday: previousReward[i].toString(),
+        reward: (todayReward[i] - previousReward[i]).toString(),
       })
       throw 'Invalid reward'
     }
@@ -146,7 +150,7 @@ async function readRewardForBtcStakers(todayBlock: number, yesterdayBlock: numbe
   const mapBtcStakerToReceiver: Record<string, Array<{
     receiver: string,
     txHash: string,
-    to: string
+      to: string
   }>> = {}
   btcStakers.forEach((item) => {
     const data = {
@@ -194,6 +198,7 @@ async function readRewardForBtcStakers(todayBlock: number, yesterdayBlock: numbe
           mapBtcStakerToReceiver[address],
           {
             blockTag: todayBlock,
+            from: address,
           }
         )).reduce(
           (acc: bigint, cur: bigint) => acc + cur,
@@ -289,11 +294,11 @@ async function readCoreRewards({
   const batchSize = Math.min(5, usersAddress.length);
   const userStakedOrderResults = await fetchUserStakedOrders(usersAddress, blockNumber, batchSize);
   const rewards = await fetchMarketplaceRewards(usersAddress, userStakedOrderResults, blockNumber, batchSize);
-  
+
   if (rewards.length !== usersAddress.length) {
     throw new Error('Length mismatch: rewards.length != usersAddress.length');
   }
-  
+
   return rewards;
 }
 
@@ -304,7 +309,7 @@ async function fetchUserStakedOrders(
 ) {
   let userStakedOrder = [];
   let userStakedOrderResult = [];
-  
+
   for (let i = 0; i < usersAddress.length; i++) {
     userStakedOrder.push({
       functionName: 'getUserStakedOrder',
@@ -312,7 +317,7 @@ async function fetchUserStakedOrders(
       address: totalAssetAddress,
       abi: assetOnchainAbi,
     });
-    
+
     if (userStakedOrder.length >= batchSize || i === usersAddress.length - 1) {
       await sleep(100)
       const result = await multicall(publicClient, {
@@ -320,18 +325,18 @@ async function fetchUserStakedOrders(
         multicallAddress: multiCallAddress,
         blockNumber: BigInt(blockNumber)
       }) as any;
-      
+
       userStakedOrderResult = userStakedOrderResult.concat(
         result.map((el) => el.result)
       );
       userStakedOrder = [];
     }
   }
-  
+
   if (userStakedOrderResult.length !== usersAddress.length) {
     throw new Error('Length mismatch: userStakedOrderResult.length != usersAddress.length');
   }
-  
+
   return userStakedOrderResult;
 }
 
@@ -341,67 +346,37 @@ async function fetchMarketplaceRewards(
   blockNumber: number,
   batchSize: number
 ) {
-  let getMarketplaceRewardCalls = [];
-  let rewards = [];
-  let chunkSizes = [];
-  let processedUsers = 0;
-  
+  let getMarketplaceRewardCalls = []
+  let rewards = []
   for (let i = 0; i < usersAddress.length; i++) {
-    const stakedOrders = userStakedOrderResults[i];
-    
+    const stakedOrders = userStakedOrderResults[i]
     if (stakedOrders.length) {
-      for (let j = 0; j < stakedOrders.length; j += 5) {
-        const orderChunk = stakedOrders.slice(j, j + 5);
+      for (let j = 0; j < stakedOrders.length; j++) {
         getMarketplaceRewardCalls.push({
-          functionName: 'getMarketplaceReward',
-          args: [usersAddress[i], orderChunk],
-          address: totalAssetAddress,
-          abi: assetOnchainAbi,
-        });
-        
-        if (j === 0) chunkSizes.push({ userId: i, chunks: Math.ceil(stakedOrders.length / 5) });
+          functionName: 'rewardFor',
+          args: [
+            '0x0000000000000000000000000000000000000000000000000000000000000001',
+            usersAddress[i],
+          ],
+          abi: receiverAbi,
+          address: userStakedOrderResults[i][j],
+        })
       }
-    } else {
-      getMarketplaceRewardCalls.push({
-        functionName: 'getMarketplaceReward',
-        args: [usersAddress[i], stakedOrders],
-        address: totalAssetAddress,
-        abi: assetOnchainAbi,
-      });
-      
-      chunkSizes.push({ userId: i, chunks: 1 });
-    }
-    
-    if (getMarketplaceRewardCalls.length >= batchSize || i === usersAddress.length - 1) {
-      await sleep(100)
+      // @ts-ignore
       const result = await multicall(publicClient, {
         contracts: getMarketplaceRewardCalls as any,
         multicallAddress: multiCallAddress,
         blockNumber: BigInt(blockNumber),
-      });
-      
-      let resultIndex = 0;
-      for (const { userId, chunks } of chunkSizes) {
-        let totalReward = BigInt(0);
-        const userChunkResults = result.slice(resultIndex, resultIndex + chunks);
-        resultIndex += chunks;
-        
-        for (const chunkResult of userChunkResults) {
-          totalReward += (chunkResult.result as bigint) || BigInt(0);
-        }
-        
-        rewards[userId] = {
-          reward: totalReward,
-          userStakedData: userStakedOrderResults[userId],
-        };
-        
-        processedUsers++;
-      }
-      
-      getMarketplaceRewardCalls = [];
-      chunkSizes = [];
+      })
+      rewards[i] = result.reduce(
+        (acc, cur) => acc + (cur.result as bigint),
+        BigInt(0)
+      )
+    } else {
+      rewards[i] = BigInt(0)
     }
+    getMarketplaceRewardCalls = []
   }
-  
-  return rewards;
+
+  return rewards
 }
