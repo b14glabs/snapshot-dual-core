@@ -5,8 +5,7 @@ import { log } from 'console'
 import { web3 } from '../main'
 import { snapshot } from '.'
 import { persistLog } from '../logger'
-
-const coreVaultFromBlockPath = 'volumes/coreVaultFromBlock'
+import { getUtilData, updateUtilData } from '../service/util.service'
 
 export async function listenEvents() {
   try {
@@ -18,7 +17,7 @@ export async function listenEvents() {
     let fromBlock = 0
 
     try {
-      fromBlock = Number(fs.readFileSync(coreVaultFromBlockPath, 'utf-8'))
+      fromBlock = Number(await getUtilData("coreVaultFromBlock"))
     } catch (error) {
       log(`Error reading file: ${error}`)
     }
@@ -44,8 +43,7 @@ export async function listenEvents() {
         )
       }
     }
-
-    fs.writeFileSync(coreVaultFromBlockPath, toBlock.toString())
+    await updateUtilData("coreVaultFromBlock", toBlock.toString())
   } catch (error) {
     persistLog(`listenEvents error: ${error}`)
   } finally {
