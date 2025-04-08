@@ -22,6 +22,7 @@ import {
   insertPoint,
 } from '../service/point.service'
 import { BITCOIN_STAKE_ADDRESS, TYPE } from '../const'
+import { getUtilData, updateUtilData } from '../service/util.service'
 
 dotenv.config()
 async function sleep(ms: number) {
@@ -65,8 +66,6 @@ const totalAssetAddress = process.env.TOTAL_ASSET_ONCHAIN_ADDRESS
 const multiCallAddress = '0xcA11bde05977b3631167028862bE2a173976CA11'
 const jsonRpc = new JsonRpcProvider(archiveRpc)
 
-const turnRoundFromBlockPath = 'volumes/turnRoundFromBlock'
-
 export async function listenTurnRoundEvents() {
   try {
     const contract = new web3.eth.Contract(
@@ -77,7 +76,7 @@ export async function listenTurnRoundEvents() {
     let fromBlock = 0
 
     try {
-      fromBlock = Number(readFileSync(turnRoundFromBlockPath, 'utf-8'))
+      fromBlock = Number(await getUtilData("turnRoundFromBlock"))
     } catch (error) {
       persistLog(`Error reading file: ${error}`)
     }
@@ -94,8 +93,7 @@ export async function listenTurnRoundEvents() {
     for (const event of turnRoundEvent.slice(-1)) {
       await marketplaceRewardSnapshot(Number(event.blockNumber))
     }
-
-    writeFileSync(turnRoundFromBlockPath, toBlock.toString())
+    await updateUtilData("turnRoundFromBlock", toBlock.toString())
   } catch (error) {
     persistLog(`listenEvents error: ${error}`)
   } finally {
